@@ -121,8 +121,13 @@ abstract class Base
     protected function initController()
     {
         // 构造控制器类
-        // TODO 使用目录类生成，考虑控制器为空的情况
-        $controllerClass = '\\' . $this->appName . '\\Controller\\' . $this->moduleName . '\\' . $this->controllerName;
+        $itemList = array(
+            $this->appName, 
+            'Controller', 
+            $this->moduleName, 
+            $this->controllerName
+        );
+        $controllerClass = '\\' . implode('\\', array_filter($itemList));
         if (! class_exists($controllerClass)) {
             throw new \Exception('error controller class ' . $controllerClass);
         } else {
