@@ -24,10 +24,10 @@ class Web extends Base
     final protected function initWebApplication()
     {
         // 设置cookie_httponly
-        ini_set('session.cookie_httponly', 1);
+        // ini_set('session.cookie_httponly', 1);
         
         // 开启session
-        session_start();
+        // session_start();
         
         // 页面编码
         header('Content-Type:text/html;charset=utf-8');
