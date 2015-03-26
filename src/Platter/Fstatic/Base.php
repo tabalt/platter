@@ -17,13 +17,13 @@ abstract class Base
         self::TYPE_CSS, 
         self::TYPE_JS
     );
-    
+
     /**
      * 静态文件目录
      * @var string
      */
     protected $staticPath = '';
-    
+
     abstract protected function getStaticUrl($type, $files);
 
     protected function createStaticTag($type, $url)
@@ -40,9 +40,19 @@ abstract class Base
         return $tag;
     }
 
-    protected function loadStaticWithTag($type, $files)
+    protected function outputStaticTag($type, $url)
     {
-        
+        $tag = $this->createStaticTag($type, $url);
+        if (empty($tag) || empty($url)) {
+            return false;
+        } else {
+            \Platter\Http\Response::output($tag);
+            return true;
+        }
+    }
+
+    protected function loadStaticWithTag($type, $files, $isDev = false)
+    {
         if (! in_array($type, $this->typeList)) {
             return false;
         }
@@ -55,18 +65,19 @@ abstract class Base
                 $files
             );
         }
-        
-        $url = $this->getStaticUrl($type, $files);
-        if (empty($url)) {
-            return false;
+        foreach ($files as $key => $file) {
+            $files[$key] = urlencode($file);
         }
         
-        $tag = $this->createStaticTag($type, $url);
-        if (empty($tag)) {
-            return false;
+        if (! $isDev) {
+            $url = $this->getStaticUrl($type, $files);
+            $this->outputStaticTag($type, $url);
+        } else {
+            foreach ($files as $file) {
+                $url = '/static/' . $type . '/' . $file;
+                $this->outputStaticTag($type, $url);
+            }
         }
-        
-        \Platter\Http\Response::output($tag);
         
         return true;
     }
@@ -79,14 +90,14 @@ abstract class Base
     {
         $this->staticPath = $staticPath;
     }
-    
-    public function loadCssWithTag($files)
+
+    public function loadCssWithTag($files, $isDev = false)
     {
-        $this->loadStaticWithTag(self::TYPE_CSS, $files);
+        $this->loadStaticWithTag(self::TYPE_CSS, $files, $isDev);
     }
 
-    public function loadJsWithTag($files)
+    public function loadJsWithTag($files, $isDev = false)
     {
-        $this->loadStaticWithTag(self::TYPE_JS, $files);
+        $this->loadStaticWithTag(self::TYPE_JS, $files, $isDev);
     }
 }
