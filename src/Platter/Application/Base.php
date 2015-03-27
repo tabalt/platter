@@ -61,7 +61,10 @@ abstract class Base
      */
     protected function getPathWithModuleName($path)
     {
-        return $path . strtolower($this->moduleName) . DIRECTORY_SEPARATOR;
+        $dirList = array(
+            strtolower($this->moduleName)
+        );
+        return \Platter\Component\Path::create($dirList, $path);
     }
 
     /**
@@ -71,7 +74,8 @@ abstract class Base
     final protected function initConfig()
     {
         // 加载项目配置文件
-        $appConfigFile = $this->configPath . 'config.php';
+        $configPath = $this->getPathWithModuleName($this->configPath);
+        $appConfigFile = "{$configPath}config.php";
         \Platter\Component\Config::parseFile($appConfigFile);
     }
 
@@ -81,7 +85,8 @@ abstract class Base
      */
     final protected function initLogger()
     {
-        \Platter\Component\Logger::setConfig($this->logPath);
+        $logPath = $this->getPathWithModuleName($this->logPath);
+        \Platter\Component\Logger::setConfig($logPath);
     }
 
     /**
@@ -90,6 +95,12 @@ abstract class Base
      */
     final protected function initBaseApplication()
     {
+        // 初始化配置
+        $this->initConfig();
+        
+        // 初始化日志
+        $this->initLogger();
+        
         // 设置时区 东8区（china）
         date_default_timezone_set('PRC');
         
@@ -175,7 +186,7 @@ abstract class Base
      */
     public function setConfigPath($configPath)
     {
-        $this->configPath = $this->getPathWithModuleName($configPath);
+        $this->configPath = $configPath;
     }
 
     /**
@@ -184,7 +195,7 @@ abstract class Base
      */
     public function setLogPath($logPath)
     {
-        $this->logPath = $this->getPathWithModuleName($logPath);
+        $this->logPath = $logPath;
     }
 
     /**
@@ -220,12 +231,6 @@ abstract class Base
      */
     final public function run()
     {
-        // 初始化配置
-        $this->initConfig();
-        
-        // 初始化日志
-        $this->initLogger();
-        
         try {
             // 初始化控制器
             $this->initController();

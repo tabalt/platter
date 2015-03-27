@@ -33,10 +33,13 @@ class Web extends Base
         header('Content-Type:text/html;charset=utf-8');
         
         // 设置控制器的模板目录
-        $this->Controller->setViewPath($this->viewPath);
+        $viewPath = $this->getPathWithModuleName($this->viewPath);
+        $this->Controller->setViewPath($viewPath);
         
         // 设置控制器的静态文件目录
-        $this->Controller->setStaticPath($this->staticPath);
+        $staticPath = $this->getPathWithModuleName($this->staticPath);
+        
+        $this->Controller->setStaticPath($staticPath);
     }
 
     /**
@@ -58,7 +61,7 @@ class Web extends Base
      */
     public function setViewPath($viewPath)
     {
-        $this->viewPath = $this->getPathWithModuleName($viewPath);
+        $this->viewPath = $viewPath;
     }
 
     /**
@@ -67,6 +70,6 @@ class Web extends Base
      */
     public function setStaticPath($staticPath)
     {
-        $this->staticPath = $staticPath . strtolower($this->moduleName) . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR;
+        $this->staticPath = $staticPath;
     }
 }

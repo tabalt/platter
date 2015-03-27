@@ -19,7 +19,7 @@ try {
     $App->setLogPath($appPath . 'log' . DIRECTORY_SEPARATOR);
     $App->setConfigPath($appPath . 'config' . DIRECTORY_SEPARATOR);
     $App->setViewPath($appPath . 'view' . DIRECTORY_SEPARATOR);
-    $App->setStaticPath($appPath . 'run' . DIRECTORY_SEPARATOR);
+    $App->setStaticPath($appPath . 'static' . DIRECTORY_SEPARATOR);
     
     $App->run();
 } catch ( \Exception $e ) {
