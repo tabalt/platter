@@ -34,8 +34,6 @@ class ClassLoader
         foreach (self::$namespaceList as $prefix => $baseDir) {
             if (strpos($className, $prefix) === 0) {
                 $classFile = self::getClassFile($className, $baseDir);
-                //TODO remove test
-                //var_dump($className); echo($classFile . "<br />");
                 if (file_exists($classFile)) {
                 	require $classFile;
                 	return true;
