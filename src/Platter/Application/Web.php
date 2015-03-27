@@ -9,13 +9,13 @@ class Web extends Base
      * 模板目录
      * @var string
      */
-    protected $viewPath = '';
+    protected $viewPath = './view/';
 
     /**
      * 静态文件目录
      * @var string
      */
-    protected $staticPath = '';
+    protected $staticPath = './static/';
 
     /**
      * 初始化Web应用程序

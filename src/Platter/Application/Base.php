@@ -45,14 +45,14 @@ abstract class Base
      * @author tabalt
      * @var string
      */
-    protected $controllerName = '';
+    protected $controllerName = 'Index';
 
     /**
      * 操作名称
      * @author tabalt
      * @var string
      */
-    protected $actionName = '';
+    protected $actionName = 'index';
 
     /**
      * 给目录加上模块名
@@ -153,12 +153,20 @@ abstract class Base
      * 构造函数
      * @author tabalt
      */
-    final public function __construct($appName, $srcPath)
+    final public function __construct($appName)
     {
         $this->appName = $appName;
-        $this->srcPath = rtrim($srcPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         
-        \Platter\Component\ClassLoader::registerNamespace($appName, $srcPath);
+        \Platter\Component\ClassLoader::registerNamespace($appName, $this->srcPath);
+    }
+
+    /**
+     * 设置代码目录
+     * @author tabalt
+     */
+    public function setSrcPath($srcPath)
+    {
+        $this->srcPath = $srcPath;
     }
 
     /**
