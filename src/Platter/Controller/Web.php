@@ -48,7 +48,7 @@ class Web extends Base
         $layoutFile = $this->viewPath . $layoutTpl;
         
         if (! file_exists($layoutFile)) {
-            throw new \Exception('布局模板' . $this->layoutTpl . '不存在');
+            throw new \Exception('layout tpl ' . $this->layoutTpl . 'not exist');
         }
         $this->layoutTpl = $layoutTpl;
     }
@@ -137,7 +137,7 @@ class Web extends Base
         $tplSuffix = Config::get('TPL_SUFFIX');
         $tplFile = "{$this->viewPath}{$tpl}.{$tplSuffix}";
         if (! file_exists($tplFile)) {
-            throw new \Exception('模板文件' . $tplFile . '不存在');
+            throw new \Exception('tpl file ' . $tplFile . 'not exist');
         } else {
             $this->assign('mainTpl', $tplFile);
         }
