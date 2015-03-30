@@ -68,6 +68,15 @@ abstract class Base
     }
 
     /**
+     * 初始化应用程序类加载
+     * @author tabalt
+     */
+    final protected function initClassLoader()
+    {
+        \Platter\Component\ClassLoader::registerNamespace($this->appName, $this->srcPath);
+    }
+
+    /**
      * 初始化配置
      * @author tabalt
      */
@@ -95,12 +104,6 @@ abstract class Base
      */
     final protected function initBaseApplication()
     {
-        // 初始化配置
-        $this->initConfig();
-        
-        // 初始化日志
-        $this->initLogger();
-        
         // 设置时区 东8区（china）
         date_default_timezone_set('PRC');
         
@@ -167,8 +170,6 @@ abstract class Base
     final public function __construct($appName)
     {
         $this->appName = $appName;
-        
-        \Platter\Component\ClassLoader::registerNamespace($appName, $this->srcPath);
     }
 
     /**
@@ -232,6 +233,16 @@ abstract class Base
     final public function run()
     {
         try {
+            
+            // 初始化应用程序类加载
+            $this->initClassLoader();
+            
+            // 初始化配置
+            $this->initConfig();
+            
+            // 初始化日志
+            $this->initLogger();
+            
             // 初始化控制器
             $this->initController();
             
