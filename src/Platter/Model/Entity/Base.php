@@ -2,7 +2,7 @@
 
 namespace Platter\Model\Entity;
 
-abstract class Base
+abstract class Base extends \Platter\Model\Base
 {
 
     /**
@@ -43,12 +43,14 @@ abstract class Base
             }
         }
     }
-    
+
     /**
      * 构造函数
      */
-    final public function __construct($data)
+    public function __construct($data, $name = null)
     {
+        parent::__construct($name);
+        
         // 格式化实体属性列表
         $this->initPropertyList($data);
     }
@@ -97,9 +99,9 @@ abstract class Base
     }
 
     /**
-     * 获取实体属性的字段列表
+     * 将实体转换成数组
      */
-    public function getDataList()
+    public function toArray()
     {
         $dataList = array();
         foreach ($this->propertyList as $field => $info) {

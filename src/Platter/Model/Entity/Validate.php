@@ -6,10 +6,10 @@ class Validate extends Base
 {
 
     /**
-     * 错误信息
-     * @var string
+     * 验证规则列表
+     * @var array
      */
-    protected $errorMessage = '';
+    protected $ruleList;
 
     /**
      * 格式化实体属性
@@ -22,16 +22,19 @@ class Validate extends Base
             $info['require'] = false;
         }
         
+        if (! isset($info['filter'])) {
+            $info['filter'] = false;
+        }
         return $info;
     }
 
     /**
-     * 获取验证规则列表
+     * 设置验证规则列表
      * @author tabalt
      * @param array $fieldList 字段列表
      * @param array $data
      */
-    protected function getValidateRuleList($fieldList = array())
+    protected function setValidateRuleList($fieldList = array())
     {
         if (empty($fieldList) || ! is_array($fieldList)) {
             $fieldList = $this->propertyList;
@@ -45,32 +48,14 @@ class Validate extends Base
             
             // 字段别名处理
             $rule['field'] = isset($rule['alias']) ? $rule['alias'] : $field;
+            
             $rule['name'] = isset($rule['name']) ? $rule['name'] : $field;
             $rule['require'] = isset($rule['require']) ? $rule['require'] : false;
+            $rule['filter'] = isset($rule['filter']) ? $rule['filter'] : false;
             
             $ruleList[$field] = $rule;
         }
-        return $ruleList;
-    }
-
-    /**
-     * 设置错误信息
-     * @author tabalt
-     * @param string $errorMessage 错误信息
-     */
-    public function setError($errorMessage)
-    {
-        $this->errorMessage = $errorMessage;
-    }
-
-    /**
-     * 获取错误信息
-     * @author tabalt
-     * @return string $errorMessage 错误信息
-     */
-    public function getError()
-    {
-        return $this->errorMessage;
+        $this->ruleList = $ruleList;
     }
 
     /**
@@ -79,16 +64,35 @@ class Validate extends Base
      * @param array $fieldList 字段列表
      * @param array $data
      */
-    public function check($fieldList)
+    public function check($fieldList = array())
     {
-        $ruleList = $this->getValidateRuleList($fieldList);
-        $dataList = $this->getDataList();
+        $this->setValidateRuleList($fieldList);
         
-        if (! \Platter\Component\Validate::execute($ruleList, $dataList)) {
+        $dataList = $this->toArray();
+        
+        if (! \Platter\Component\Validate::execute($this->ruleList, $dataList)) {
             $this->setError(\Platter\Component\Validate::getError());
             return false;
         } else {
             return true;
         }
+    }
+
+    /**
+     * 将实体转换成数组
+     */
+    public function toArray()
+    {
+        $dataList = parent::toArray();
+        $validateDataList = array();
+        
+        foreach ($dataList as $key => $value) {
+            if (isset($this->ruleList[$key])) {
+                $filter = isset($this->ruleList[$key]['filter']) ? $this->ruleList[$key]['filter'] : false;
+                
+                $validateDataList[$key] = function_exists($filter) ? $filter($value) : $value;
+            }
+        }
+        return $validateDataList;
     }
 }

@@ -37,9 +37,7 @@ class Web extends Base
         $this->Controller->setViewPath($viewPath);
         
         // 设置控制器的静态文件目录
-        $staticPath = $this->getPathWithModuleName($this->staticPath);
-        
-        $this->Controller->setStaticPath($staticPath);
+        $this->Controller->setStaticPath($this->staticPath);
     }
 
     /**

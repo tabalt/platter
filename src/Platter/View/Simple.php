@@ -21,7 +21,7 @@ class Simple extends Base
     public function assign($key, $value)
     {
         if (! preg_match('/^[a-zA-Z]/i', $key)) {
-            throw new \Exception('模板变量' . $key . '命名错误');
+            throw new \Exception('tpl variable ' . $key . 'name error');
         }
         $this->tplVarList[$key] = $value;
     }
@@ -39,7 +39,7 @@ class Simple extends Base
             extract($this->tplVarList);
         }
         if (! file_exists($tplFile)) {
-            throw new \Exception('模板文件' . $tplFile . '不存在');
+            throw new \Exception('tpl file ' . $tplFile . ' not exists');
         }
         ob_start();
         require $tplFile;

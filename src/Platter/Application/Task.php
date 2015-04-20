@@ -22,7 +22,7 @@ class Task extends Base
         // 调用父类的应用程序初始化方法
         parent::initApplication();
         
-        // 初始化Web应用程序
+        // 初始化Task应用程序
         $this->initTaskApplication();
     }
 }

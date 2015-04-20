@@ -9,7 +9,8 @@ class Config
      * @author tabalt
      */
     protected static $defaultConfigList = array(
-        'TPL_SUFFIX' => 'php',
+        'TEMPLATE_ENGINE' => 'Simple',
+        'TEMPLATE_SUFFIX' => 'php',
         'REMOVE_TPL_SPACES' => false,
         'IS_DEBUG' => false,
     );

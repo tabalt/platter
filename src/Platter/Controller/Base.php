@@ -31,6 +31,13 @@ abstract class Base
     protected $actionName = '';
 
     /**
+     * 临时文件目录
+     * @author tabalt
+     * @var string
+     */
+    protected $tmpPath = '';
+
+    /**
      * 初始化基类控制器
      * @author tabalt
      */
@@ -68,6 +75,15 @@ abstract class Base
         $this->moduleName = $moduleName;
         $this->controllerName = $controllerName;
         $this->actionName = $actionName;
+    }
+
+    /**
+     * 设置临时文件目录
+     * @author tabalt
+     */
+    public function setTmpPath($tmpPath)
+    {
+        $this->tmpPath = $tmpPath;
     }
 
     public function run()

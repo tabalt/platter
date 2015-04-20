@@ -2,7 +2,8 @@
 
 namespace Platter\Component;
 
-class Helper {
+class Helper
+{
 
     /**
      * 验证Refer，防范csrf攻击
@@ -10,7 +11,8 @@ class Helper {
      * @param mixed $whiteHostList 白名单域名或ip
      * @return boolean true/false
      */
-    public static function checkReferer($whiteHostList = array()) {
+    public static function checkReferer($whiteHostList = array())
+    {
         $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : false;
         if (empty($referer)) {
             return false;
@@ -19,7 +21,7 @@ class Helper {
         if (strpos($referer, 'http://') !== 0 && strpos($referer, 'https://') !== 0) {
             return false;
         }
-        //设置默认域名
+        // 设置默认域名
         if (empty($whiteHostList)) {
             $whiteHostList = array(
                 $_SERVER['HTTP_HOST']
@@ -29,7 +31,7 @@ class Helper {
                 $whiteHostList
             );
         }
-        //refer 主机地址判断
+        // refer 主机地址判断
         $refererHost = parse_url($referer, PHP_URL_HOST);
         if (is_array($whiteHostList) && in_array($refererHost, $whiteHostList)) {
             return true;
@@ -43,7 +45,8 @@ class Helper {
      * @author tabalt
      * @param intval $code
      */
-    public static function httpStatus($code) {
+    public static function httpStatus($code)
+    {
         $codeList = array(
             100 => 'Continue', 
             101 => 'Switching Protocols', 
@@ -100,36 +103,37 @@ class Helper {
      * @param boolean $onlyRemoteAddr 是否直接返回REMOTE_ADDR
      * @return string/boolean $clientIp
      */
-    public static function getClientIp($onlyRemoteAddr = true) {
-        //是否直接返回REMOTE_ADDR
+    public static function getClientIp($onlyRemoteAddr = true)
+    {
+        // 是否直接返回REMOTE_ADDR
         if ($onlyRemoteAddr) {
             return $_SERVER['REMOTE_ADDR'];
         }
         
-        //验证是否为非私有IP
+        // 验证是否为非私有IP
         if (filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
             return $_SERVER['REMOTE_ADDR'];
         }
         
-        //验证HTTP头中是否有HTTP_X_FORWARDED_FOR
-        if (!isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        // 验证HTTP头中是否有HTTP_X_FORWARDED_FOR
+        if (! isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             return $_SERVER['REMOTE_ADDR'];
         }
         
-        //定义客户端IP
+        // 定义客户端IP
         $clientIp = '';
         
-        //获取", "的位置
+        // 获取", "的位置
         $position = strrpos($_SERVER['HTTP_X_FORWARDED_FOR'], ', ');
         
-        //验证$position
+        // 验证$position
         if (false === $position) {
             $clientIp = $_SERVER['HTTP_X_FORWARDED_FOR'];
         } else {
             $clientIp = substr($_SERVER['HTTP_X_FORWARDED_FOR'], $position + 2);
         }
         
-        //验证$clientIp是否为合法IP
+        // 验证$clientIp是否为合法IP
         if (filter_var($clientIp, FILTER_VALIDATE_IP)) {
             return $clientIp;
         } else {
@@ -142,12 +146,13 @@ class Helper {
      * @author pengming
      * @param string | array $transcoding
      */
-    public static function gbk2Utf8($transcoding) {
-        //转码字符串
+    public static function gbk2Utf8($transcoding)
+    {
+        // 转码字符串
         if (is_string($transcoding)) {
             return mb_convert_encoding($transcoding, 'UTF-8', 'GBK');
         }
-        //转码数组
+        // 转码数组
         if (is_array($transcoding)) {
             $data = array();
             foreach ($transcoding as $key => $value) {
@@ -162,7 +167,8 @@ class Helper {
      * @author tabalt
      * @param string $str
      */
-    public static function stringLength($str) {
+    public static function stringLength($str)
+    {
         if (empty($str)) {
             return 0;
         }
@@ -178,10 +184,11 @@ class Helper {
      * 获取二维数组的指定列
      * @author tabalt
      * @param array $array 一般为数据库查询出的结果数组
-     * @param string $key 
+     * @param string $key
      * @return array $data 处理后的结果
      */
-    public static function getArrayColumn($array, $key) {
+    public static function getArrayColumn($array, $key)
+    {
         $data = array();
         foreach ($array as $info) {
             if (isset($info[$key])) {
@@ -195,10 +202,11 @@ class Helper {
      * 获取按新key重置的数组
      * @author tabalt
      * @param array $array 一般为数据库查询出的结果数组
-     * @param string $key 
+     * @param string $key
      * @return array $data 处理后的结果
      */
-    public static function getResetArrayByKey($array, $key) {
+    public static function getResetArrayByKey($array, $key)
+    {
         $data = array();
         foreach ($array as $info) {
             if (isset($info[$key])) {
@@ -212,20 +220,21 @@ class Helper {
      * 创建签名
      * @author tabalt
      * @param array $data 要传递的数据
-     * @param string $entry_secret 密钥
+     * @param string $appSecret 密钥
      * @return string $sign 生成的签名串
      */
-    public static function createSign($data, $entrySecret) {
+    public static function createSign($data, $appSecret)
+    {
         ksort($data);
         $sign = '';
         foreach ($data as $key => $value) {
             if (is_array($value)) {
-                $sign .= self::createSign($value, $entrySecret);
+                $sign .= self::createSign($value, $appSecret);
             } else {
                 $sign .= $value;
             }
         }
-        $sign = md5($sign . $entrySecret);
+        $sign = md5($sign . $appSecret);
         return $sign;
     }
 }

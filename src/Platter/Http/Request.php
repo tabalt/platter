@@ -6,12 +6,32 @@ class Request
 {
 
     /**
+     * 过滤数据
+     * @author tabalt
+     * @param string $value
+     * @param string $filter
+     * @param mixed $defaultValue
+     */
+    protected static function filterValue($value, $filter)
+    {
+        // 考虑数组的情况
+        if (function_exists($filter)) {
+            if (is_array($value)) {
+                $value = array_map($filter, $value);
+            } else {
+                $value = $filter($value);
+            }
+        }
+        return $value;
+    }
+
+    /**
      * 提交方式判断
      * @author tabalt
      * @param string $type 提交方式
      * @return boolean true/false
      */
-    protected static function checkRequestMethod($type)
+    public static function checkRequestMethod($type)
     {
         $typeList = array(
             'post', 
@@ -25,22 +45,6 @@ class Request
         } else {
             return false;
         }
-    }
-
-    /**
-     * 过滤数据
-     * @author tabalt
-     * @param string $value
-     * @param string $filter
-     * @param mixed $defaultValue
-     */
-    protected static function filterValue($value, $filter)
-    {
-        // TODO 考虑数组的情况
-        if (function_exists($filter)) {
-            $value = $filter($value);
-        }
-        return $value;
     }
 
     /**

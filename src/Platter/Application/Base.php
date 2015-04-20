@@ -34,6 +34,13 @@ abstract class Base
     protected $logPath = './log/';
 
     /**
+     * 临时文件目录
+     * @author tabalt
+     * @var string
+     */
+    protected $tmpPath = './tmp/';
+
+    /**
      * 模块名称
      * @author tabalt
      * @var string
@@ -150,6 +157,7 @@ abstract class Base
                 throw new \Exception('action ' . $this->actionName . ' not exists in class ' . $controllerClass);
             } else {
                 $this->Controller = new $controllerClass($this->moduleName, $this->controllerName, $this->actionName);
+                $this->Controller->setTmpPath($this->tmpPath);
             }
         }
     }
@@ -197,6 +205,15 @@ abstract class Base
     public function setLogPath($logPath)
     {
         $this->logPath = $logPath;
+    }
+
+    /**
+     * 设置临时文件目录
+     * @author tabalt
+     */
+    public function setTmpPath($tmpPath)
+    {
+        $this->tmpPath = $tmpPath;
     }
 
     /**

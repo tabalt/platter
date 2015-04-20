@@ -2,8 +2,6 @@
 
 namespace Platter\Controller;
 
-use Platter\Component\Config;
-
 /**
  * 视图控制器类
  * @author tabalt
@@ -43,14 +41,16 @@ class Web extends Base
      * @author tabalt
      * @var string
      */
-    protected function setLayoutTpl($layoutTpl = 'layout.php')
+    protected function setLayoutTpl($layoutTpl = false)
     {
-        $layoutFile = $this->viewPath . $layoutTpl;
-        
-        if (! file_exists($layoutFile)) {
-            throw new \Exception('layout tpl ' . $this->layoutTpl . ' not exist');
+        if ($layoutTpl) {
+            $layoutFile = $this->viewPath . $layoutTpl;
+            
+            if (! file_exists($layoutFile)) {
+                throw new \Exception('layout tpl ' . $this->layoutTpl . ' not exist');
+            }
+            $this->layoutTpl = $layoutTpl;
         }
-        $this->layoutTpl = $layoutTpl;
     }
 
     /**
@@ -59,8 +59,11 @@ class Web extends Base
      */
     protected function initView()
     {
+        $templateEngine = \Platter\Component\Config::get('TEMPLATE_ENGINE');
+        $viewClass = '\\Platter\\View\\' . ucfirst($templateEngine);
+        
         // 实例化视图
-        $this->View = new \Platter\View\Simple($this->viewPath);
+        $this->View = new $viewClass($this->viewPath, $this->tmpPath);
         
         // 设置布局模板
         $this->setLayoutTpl();
@@ -113,14 +116,14 @@ class Web extends Base
      * @param string|array $tplVar
      * @param mixed $value
      */
-    protected function assign($tplVar, $value)
+    protected function assign($tplVar, $value, $filterHtml = true)
     {
         if (is_array($tplVar)) {
             foreach ($tplVar as $key => $value) {
-                $this->View->assign($key, $value);
+                $this->View->assign($key, $value, $filterHtml);
             }
         } else {
-            $this->View->assign($tplVar, $value);
+            $this->View->assign($tplVar, $value, $filterHtml);
         }
     }
 
@@ -134,10 +137,10 @@ class Web extends Base
         if (empty($tpl)) {
             $tpl = strtolower($this->controllerName) . DIRECTORY_SEPARATOR . $this->actionName;
         }
-        $tplSuffix = Config::get('TPL_SUFFIX');
-        $tplFile = "{$this->viewPath}{$tpl}.{$tplSuffix}";
+        $tplName = $tpl . '.' . \Platter\Component\Config::get('TEMPLATE_SUFFIX');
+        $tplFile = $this->viewPath . $tplName;
         if (! file_exists($tplFile)) {
-            throw new \Exception('tpl file ' . $tplFile . 'not exist');
+            throw new \Exception('tpl file ' . $tplFile . ' not exist');
         } else {
             $this->assign('mainTpl', $tplFile);
         }
@@ -162,7 +165,7 @@ class Web extends Base
             $this->assign('status', $status);
             $this->assign('info', $info);
             $this->assign('jumpUrl', $data);
-            $tplFile = $this->viewPath . "/public/message.html";
+            $tplFile = $this->viewPath . "public/message.php";
             $this->View->display($tplFile);
         }
     }
@@ -183,30 +186,29 @@ class Web extends Base
      * error 方法
      * @author tabalt
      * @param string $message 错误信息
-     * @param int $errorCode 错误码
      * @param string $data 返回的数据
      * @param boolean $ajax 是否为Ajax方式
+     * @param int $errorCode 错误码
      */
-    protected function error($info, $errorCode = 0, $data = false, $ajax = false)
+    protected function error($info, $data = false, $ajax = false, $errorCode = -1)
     {
         $this->showMessage(0, $errorCode, $info, $data, $ajax);
         exit();
     }
 
     /**
-     * 重写检测参数的值方法，为空返回错误码
+     * 跳转函数
      * @author tabalt
-     * @param string $method
-     * @param string $key
-     * @param string $filter
+     * @param string $url URL
+     * @param boolean $ajax 是否为Ajax方式
      */
-    protected function checkParam($method, $key, $filter, $defaultValue = false)
+    protected function redirect($url, $ajax = false)
     {
-        // TODO check this code
-        $value = parent::checkParam($method, $key, $filter, $defaultValue);
-        if (empty($value)) {
-            $this->error('缺少参数' . htmlspecialchars($key), 0);
+        if ($ajax || \Platter\Http\Request::isAjax()) {
+            $this->showMessage(1, 0, 'redirect', $url);
+        } else {
+            header("Location:" . $url);
         }
-        return $value;
+        exit();
     }
 }

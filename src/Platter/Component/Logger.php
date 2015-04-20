@@ -2,9 +2,11 @@
 
 namespace Platter\Component;
 
-class Logger {
+class Logger
+{
 
     private static $logPath = './log/';
+
     /**
      * 日志文件名模板
      * @author tabalt
@@ -47,7 +49,8 @@ class Logger {
      * @param string $template
      * @return $template
      */
-    private static function parseTemplate($type, $template) {
+    private static function parseTemplate($type, $template)
+    {
         $search = array(
             '%type', 
             '%n'
@@ -57,7 +60,7 @@ class Logger {
             "\n"
         );
         $template = str_replace($search, $replace, $template);
-        //时间处理
+        // 时间处理
         $template = preg_replace('/%d{(.*)}/e', "date('\\1')", $template);
         return $template;
     }
@@ -68,7 +71,8 @@ class Logger {
      * @param array $config
      * @return void
      */
-    public static function setConfig($logPath, $fileTpl = '%type.log.%d{Ymd}', $contentTpl = '%d{Y-m-d H:i:s} [%type] %content in %file at %line%n') {
+    public static function setConfig($logPath, $fileTpl = '%type.log.%d{Ymd}', $contentTpl = '%d{Y-m-d H:i:s} [%type] %content in %file at %line%n')
+    {
         self::$logPath = $logPath;
         self::$fileTpl = $fileTpl;
         self::$contentTpl = $contentTpl;
@@ -81,23 +85,23 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function write($type, $content, $self = false) {
-        
-        //过滤日志类型
-        if (!in_array(strtolower($type), self::$typeList)) {
-            $type = 'info';
+    public static function write($type, $content, $self = false)
+    {
+        // 过滤日志类型
+        if (! in_array(strtolower($type), self::$typeList)) {
+            $type = str_replace('.', '', strip_tags($type));
         }
-        //获取back trace
+        // 获取back trace
         $debugBacktraceList = debug_backtrace();
-        //验证是否为类内调用
+        // 验证是否为类内调用
         if ($self === true && isset($debugBacktraceList[1])) {
-            //如果是类内调用, 取下标为1的元素
+            // 如果是类内调用, 取下标为1的元素
             $debugBacktrace = $debugBacktraceList[1];
         } else {
-            //如果非类内调用, 取下标为0的元素
+            // 如果非类内调用, 取下标为0的元素
             $debugBacktrace = $debugBacktraceList[0];
         }
-        //替换日志内容
+        // 替换日志内容
         $content = str_replace('%content', $content, self::parseTemplate(strtoupper($type), self::$contentTpl));
         $search = array(
             '%file', 
@@ -110,10 +114,10 @@ class Logger {
         $content = str_replace($search, $replace, $content);
         $filePath = self::parseTemplate($type, self::$logPath . self::$fileTpl);
         $dirName = dirname($filePath);
-        if (!is_dir($dirName)) {
+        if (! is_dir($dirName)) {
             mkdir($dirName);
         }
-        //写入文件
+        // 写入文件
         \Platter\Component\File::asyncWrite($filePath, $content, 'a');
     }
 
@@ -124,7 +128,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function trace($content) {
+    public static function trace($content)
+    {
         self::write('trace', $content, true);
     }
 
@@ -135,7 +140,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function debug($content) {
+    public static function debug($content)
+    {
         self::write('debug', $content, true);
     }
 
@@ -146,7 +152,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function info($content) {
+    public static function info($content)
+    {
         self::write('info', $content, true);
     }
 
@@ -157,7 +164,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function warning($content) {
+    public static function warning($content)
+    {
         self::write('warning', $content, true);
     }
 
@@ -168,7 +176,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function error($content) {
+    public static function error($content)
+    {
         self::write('error', $content, true);
     }
 
@@ -179,7 +188,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function notice($content) {
+    public static function notice($content)
+    {
         self::write('notice', $content, true);
     }
 
@@ -190,7 +200,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function fatal($content) {
+    public static function fatal($content)
+    {
         self::write('fatal', $content, true);
     }
 
@@ -201,7 +212,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function sql($content) {
+    public static function sql($content)
+    {
         self::write('sql', $content, true);
     }
 
@@ -212,7 +224,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function cache($content) {
+    public static function cache($content)
+    {
         self::write('cache', $content, true);
     }
 
@@ -223,7 +236,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function queue($content) {
+    public static function queue($content)
+    {
         self::write('queue', $content, true);
     }
 
@@ -234,7 +248,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function exception($content) {
+    public static function exception($content)
+    {
         self::write('exception', $content, true);
     }
 
@@ -245,7 +260,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function api($content) {
+    public static function api($content)
+    {
         self::write('api', $content, true);
     }
 
@@ -256,8 +272,8 @@ class Logger {
      * @param string $content
      * @return void
      */
-    public static function framework($content) {
+    public static function framework($content)
+    {
         self::write('framework', $content, true);
     }
-
 }
