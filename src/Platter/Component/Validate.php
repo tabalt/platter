@@ -43,9 +43,9 @@ class Validate
         // 最大长度 最小最大都不为空才做判断
         'maxLength' => false, 
         // 最小数字大小
-        'minNumber' => false,
+        'minNumber' => false, 
         // 最大数字大小 最小最大都不为空才做判断
-        'maxNumber' => false,
+        'maxNumber' => false, 
         // 正则表达式 为空则不做判断,
         'regex' => false, 
         // 允许的值列表 需传数组
@@ -211,11 +211,10 @@ class Validate
         // 规则验证
         foreach (self::$ruleList as $rule) {
             // TODO 考虑数据为数组的情况
-            $fieldValue = isset($data[$rule['field']]) ? $data[$rule['field']] : false;
-            $fieldValue = str_replace("　", '', trim($fieldValue));
+            $fieldValue = isset($data[$rule['field']]) ? @trim($data[$rule['field']]) : null;
             // 值是否为空
             $isValueEmpty = false;
-            if ($fieldValue === false || $fieldValue === '') {
+            if (is_null($fieldValue) || $fieldValue === '') {
                 $isValueEmpty = true;
             }
             

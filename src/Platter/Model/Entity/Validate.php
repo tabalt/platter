@@ -25,6 +25,11 @@ class Validate extends Base
         if (! isset($info['filter'])) {
             $info['filter'] = false;
         }
+        
+        if (! isset($info['default'])) {
+            $info['default'] = null;
+        }
+        
         return $info;
     }
 
@@ -87,9 +92,19 @@ class Validate extends Base
         $validateDataList = array();
         
         foreach ($dataList as $key => $value) {
-            if (isset($this->ruleList[$key])) {
-                $filter = isset($this->ruleList[$key]['filter']) ? $this->ruleList[$key]['filter'] : false;
-                
+            
+            // 验证中规则不存在的字段直接忽略
+            if (! isset($this->ruleList[$key])) {
+                continue;
+            }
+            
+            $default = isset($this->ruleList[$key]['default']) ? $this->ruleList[$key]['default'] : null;
+            $filter = isset($this->ruleList[$key]['filter']) ? $this->ruleList[$key]['filter'] : false;
+            
+            // 没有值 时，设为默认值
+            $value = !is_null($value) ? $value : $default;
+            
+            if (! is_null($value)) {
                 $validateDataList[$key] = function_exists($filter) ? $filter($value) : $value;
             }
         }
