@@ -62,19 +62,6 @@ abstract class Base
     protected $actionName = 'index';
 
     /**
-     * 给目录加上模块名
-     * @param string $path
-     * @return string
-     */
-    protected function getPathWithModuleName($path)
-    {
-        $dirList = array(
-            strtolower($this->moduleName)
-        );
-        return \Platter\Component\Path::create($dirList, $path);
-    }
-
-    /**
      * 初始化应用程序类加载
      * @author tabalt
      */
@@ -90,8 +77,7 @@ abstract class Base
     final protected function initConfig()
     {
         // 加载项目配置文件
-        $configPath = $this->getPathWithModuleName($this->configPath);
-        $appConfigFile = "{$configPath}config.php";
+        $appConfigFile = "{$this->configPath}config.php";
         \Platter\Component\Config::parseFile($appConfigFile);
     }
 
@@ -101,8 +87,7 @@ abstract class Base
      */
     final protected function initLogger()
     {
-        $logPath = $this->getPathWithModuleName($this->logPath);
-        \Platter\Component\Logger::setConfig($logPath);
+        \Platter\Component\Logger::setConfig($this->logPath);
     }
 
     /**

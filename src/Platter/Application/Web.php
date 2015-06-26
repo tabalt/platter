@@ -33,8 +33,7 @@ class Web extends Base
         header('Content-Type:text/html;charset=utf-8');
         
         // 设置控制器的模板目录
-        $viewPath = $this->getPathWithModuleName($this->viewPath);
-        $this->Controller->setViewPath($viewPath);
+        $this->Controller->setViewPath($this->viewPath);
         
         // 设置控制器的静态文件目录
         $this->Controller->setStaticPath($this->staticPath);
