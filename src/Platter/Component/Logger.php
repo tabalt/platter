@@ -12,7 +12,7 @@ class Logger
      * @author tabalt
      * @var string
      */
-    private static $fileTpl = '%type.log.%d{Ymd}';
+    private static $fileTpl = '%type.log';
 
     /**
      * 日志内容模板
@@ -61,7 +61,11 @@ class Logger
         );
         $template = str_replace($search, $replace, $template);
         // 时间处理
-        $template = preg_replace('/%d{(.*)}/e', "date('\\1')", $template);
+        $replace_callback = function ($matches)
+        {
+            return date($matches[1]);
+        };
+        $template = preg_replace_callback('/%d{(.*)}/', $replace_callback, $template);
         return $template;
     }
 
@@ -71,7 +75,7 @@ class Logger
      * @param array $config
      * @return void
      */
-    public static function setConfig($logPath, $fileTpl = '%type.log.%d{Ymd}', $contentTpl = '%d{Y-m-d H:i:s} [%type] %content in %file at %line%n')
+    public static function setConfig($logPath, $fileTpl = '%type.log', $contentTpl = '%d{Y-m-d H:i:s} [%type] %content in %file at %line%n')
     {
         self::$logPath = $logPath;
         self::$fileTpl = $fileTpl;
