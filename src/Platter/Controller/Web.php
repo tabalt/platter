@@ -47,7 +47,7 @@ class Web extends Base
             $layoutFile = $this->viewPath . $layoutTpl;
             
             if (! file_exists($layoutFile)) {
-                throw new \Exception('layout tpl ' . $this->layoutTpl . ' not exist');
+                throw new \Exception('layout tpl ' . $layoutTpl . ' not exist');
             }
             $this->layoutTpl = $layoutTpl;
         }
