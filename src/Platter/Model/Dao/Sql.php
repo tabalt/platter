@@ -14,6 +14,13 @@ class Sql extends Base
     const QUERY_TYPE_UPDATE = 4;
 
     /**
+     * 全名
+     * @author tabalt
+     * @var sting
+     */
+    protected $fullName;
+
+    /**
      * 默认配置KEY
      * @author tabalt
      * @var sting
@@ -67,8 +74,9 @@ class Sql extends Base
      */
     private function queryTableFields()
     {
-        $sql = "SHOW COLUMNS FROM " . $this->getTableFullName();
+        $sql = 'SHOW COLUMNS FROM `' . $this->getFullName() . '`;';
         $result = $this->db->getResult($sql);
+        
         if (! empty($result)) {
             $fieldList = array();
             foreach ($result as $fieldInfo) {
@@ -90,7 +98,7 @@ class Sql extends Base
             $this->setCacheFieldList($fieldList);
             return $fieldList;
         } else {
-            throw new \Exception('table ' . $this->getTableFullName() . '\'s fieldList query error');
+            throw new \Exception('table ' . $this->getFullName() . '\'s fieldList query error');
         }
     }
 
@@ -127,10 +135,10 @@ class Sql extends Base
     private function getTableFields()
     {
         $fieldList = array();
-        if (is_debug()) {
+        if (\Platter\Component\Config::get('IS_DEBUG')) {
             $fieldList = $this->queryTableFields();
         } else {
-            $fieldList = $this->getCacheFieldList($this->getTableFullName());
+            $fieldList = $this->getCacheFieldList($this->getFullName());
             if (! empty($fieldList)) {
                 // 从缓存中返回 并设置主键
                 foreach ($fieldList as $fieldInfo) {
@@ -152,6 +160,9 @@ class Sql extends Base
     protected function formatConfig($config)
     {
         $config = array_change_key_case($config);
+        
+        // 设置全名
+        $this->fullName = isset($config['prefix']) ? $config['prefix'] . strtolower($this->name) : strtolower($this->name);
         
         return array(
             'host' => isset($config['host']) ? $config['host'] : 'localhost', 
@@ -195,13 +206,12 @@ class Sql extends Base
     }
 
     /**
-     * 获取表全名
+     * 获取全名
      * @author tabalt
-     * @return array $realTableName 表全名
      */
-    public function getTableFullName()
+    public function getFullName()
     {
-        return $this->tableFullName;
+        return $this->fullName;
     }
 
     /**
@@ -266,7 +276,6 @@ class Sql extends Base
         // 获取logic
         $logic = isset($where['logic']) ? $where['logic'] : $logic;
         unset($where['logic']);
-        $where = array();
         if (is_array($where) && ! empty($where)) {
             $tplList = $dataList = array();
             foreach ($where as $field => $value) {
@@ -301,6 +310,7 @@ class Sql extends Base
             $this->queryDataList['where']['tpl'] = implode(" {$logic} ", $tplList);
             $this->queryDataList['where']['data'] = $dataList;
         }
+        
         return $this;
     }
 
@@ -432,9 +442,9 @@ class Sql extends Base
         if (! empty($group)) {
             $group = 'GROUP BY ' . $group;
         }
-        $sqlTpl = "SELECT " . implode(',', $fieldList) . " FROM {$this->getTableFullName()} {$where} {$group} {$order} {$page};";
+        $sqlTpl = "SELECT " . implode(',', $fieldList) . " FROM {$this->getFullName()} {$where} {$group} {$order} {$page};";
         try {
-            return $this->query($sqlTpl, $whereData, 'select');
+            return $this->query($sqlTpl, $whereData, self::QUERY_TYPE_SELECT);
         } catch ( \Exception $e ) {
             $this->setError($e->getMessage());
             return false;
@@ -453,9 +463,9 @@ class Sql extends Base
             $fieldStr .= '`' . $fieldName . '`,';
             $valueStr .= ':' . $fieldName . ',';
         }
-        $sqlTpl = "INSERT INTO " . $this->getTableFullName() . " ( " . rtrim($fieldStr, ',') . " ) VALUES ( " . rtrim($valueStr, ',') . " ); ";
+        $sqlTpl = "INSERT INTO " . $this->getFullName() . " ( " . rtrim($fieldStr, ',') . " ) VALUES ( " . rtrim($valueStr, ',') . " ); ";
         try {
-            return $this->query($sqlTpl, $data, 'insert');
+            return $this->query($sqlTpl, $data, self::QUERY_TYPE_INSERT);
         } catch ( \Exception $e ) {
             $this->setError($e->getMessage());
             return false;
@@ -486,9 +496,9 @@ class Sql extends Base
             $editStr .= "`{$fieldName}` = :{$fieldName},";
         }
         
-        $sqlTpl = "UPDATE " . $this->getTableFullName() . " SET " . rtrim($editStr, ',') . " $where ; ";
+        $sqlTpl = "UPDATE " . $this->getFullName() . " SET " . rtrim($editStr, ',') . " $where ; ";
         try {
-            return $this->query($sqlTpl, array_merge($data, $whereData), 'update');
+            return $this->query($sqlTpl, array_merge($data, $whereData), self::QUERY_TYPE_UPDATE);
         } catch ( \Exception $e ) {
             $this->setError($e->getMessage());
             return false;
@@ -512,9 +522,9 @@ class Sql extends Base
             $this->setError('删除条件不能为空');
             return false;
         }
-        $sqlTpl = "DELETE FROM " . $this->getTableFullName() . " $where ;";
+        $sqlTpl = "DELETE FROM " . $this->getFullName() . " $where ;";
         try {
-            return $this->query($sqlTpl, $whereData, 'delete');
+            return $this->query($sqlTpl, $whereData, self::QUERY_TYPE_DELETE);
         } catch ( \Exception $e ) {
             $this->setError($e->getMessage());
             return false;
@@ -527,7 +537,7 @@ class Sql extends Base
      */
     public function find()
     {
-        $result = $this - paget(1)->select();
+        $result = $this->select();
         if (isset($result[0])) {
             return $result[0];
         } else {
