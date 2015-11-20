@@ -29,8 +29,10 @@ class Local extends Base
     
         $contents = '';
         foreach ($files as $file) {
-            $filePath = $this->staticPath . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR . str_replace('../', '', $file);
-            $contents .= "\n" . \Platter\Component\File::getContents($filePath);
+            if(false === strpos($file, '../')){
+                $filePath = $this->staticPath . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR . $file;
+                $contents .= "\n" . \Platter\Component\File::getContents($filePath);
+            }
         }
         
         $contents = trim($contents);
