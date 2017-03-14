@@ -1,0 +1,17 @@
+{
+    "name": "tabalt/platter",
+    "autoload": {
+        "psr-4": {
+            "Platter\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "packagist": false
+        },
+        {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    ]
+}

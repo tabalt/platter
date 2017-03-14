@@ -3,9 +3,11 @@
 .project
 .settings
 
+.idea/
+
 .DS_Store
 ._.DS_Store
 
 tmp
 
-examples/examples.platter.conf
+examples
