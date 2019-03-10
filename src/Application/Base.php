@@ -62,15 +62,6 @@ abstract class Base
     protected $actionName = 'index';
 
     /**
-     * 初始化应用程序类加载
-     * @author tabalt
-     */
-    final protected function initClassLoader()
-    {
-        \Platter\Component\ClassLoader::registerNamespace($this->appName, $this->srcPath);
-    }
-
-    /**
      * 初始化配置
      * @author tabalt
      */
@@ -236,9 +227,6 @@ abstract class Base
     {
         try {
             
-            // 初始化应用程序类加载
-            $this->initClassLoader();
-            
             // 初始化配置
             $this->initConfig();
             
@@ -257,7 +245,7 @@ abstract class Base
             if (! \Platter\Component\Config::get('IS_DEBUG')) {
                 \Platter\Component\Logger::framework($e->getMessage());
             } else {
-                echo $e->getMessage();
+                echo $e->getMessage() . "\n";
             }
         }
     }
